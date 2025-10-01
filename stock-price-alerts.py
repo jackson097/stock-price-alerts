@@ -10,14 +10,20 @@ def load_watchlist(filename="watchlist.csv"):
             targets = []
             for target_str in row[1:]:
                 target_str = target_str.strip()
+                
+                # Check for + suffix (watch weekly close before buying)
+                watch_weekly = target_str.endswith('+')
+                if watch_weekly:
+                    target_str = target_str[:-1]  # Remove the +
+                
                 if target_str.startswith('>'):
                     # Above threshold
                     price = float(target_str[1:])
-                    targets.append(('above', price))
+                    targets.append(('above', price, watch_weekly))
                 elif target_str.startswith('<'):
                     # Below threshold
                     price = float(target_str[1:])
-                    targets.append(('below', price))
+                    targets.append(('below', price, watch_weekly))
                 else:
                     raise ValueError(f"Invalid target format '{target_str}' for {ticker}. Use >price for above alerts or <price for below alerts.")
             watchlist[ticker] = targets
@@ -33,11 +39,17 @@ def check_prices(watchlist):
             price = None
         
         if price:
-            for alert_type, target_price in targets:
+            for alert_type, target_price, watch_weekly in targets:
+                alert_message = ""
                 if alert_type == 'above' and price > target_price:
-                    alerts.append(f"{ticker} is above ${target_price:.2f} (current: ${price:.2f})")
+                    alert_message = f"{ticker} is above ${target_price:.2f} (current: ${price:.2f})"
                 elif alert_type == 'below' and price < target_price:
-                    alerts.append(f"{ticker} is below ${target_price:.2f} (current: ${price:.2f})")
+                    alert_message = f"{ticker} is below ${target_price:.2f} (current: ${price:.2f})"
+                
+                if alert_message:
+                    if watch_weekly:
+                        alert_message += " - Watch how price closes the week before buying"
+                    alerts.append(alert_message)
 
     return alerts
 
