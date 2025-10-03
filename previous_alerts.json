@@ -1,0 +1,10 @@
+{
+  "RR_above_5.56": {
+    "id": "RR_above_5.56",
+    "message": "RR is above $5.56 (current: $6.20) - Watch how price closes the week before buying",
+    "ticker": "RR",
+    "price": 6.204800128936768,
+    "target": 5.56,
+    "timestamp": "2025-10-03T15:23:01.627541"
+  }
+}
